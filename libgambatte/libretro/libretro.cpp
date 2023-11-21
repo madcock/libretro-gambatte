@@ -1547,6 +1547,22 @@ void retro_init(void)
    else
       gambatte_log_set_cb(NULL);
 
+#if defined(SF2000)
+#if defined(VIDEO_RGB565) || defined(VIDEO_ABGR1555)
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   {
+      gambatte_log(RETRO_LOG_ERROR, "RGB565 is not supported.\n");
+   }
+#else
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   {
+      gambatte_log(RETRO_LOG_ERROR, "XRGB8888 is not supported.\n");
+   }
+#endif
+#endif
+
    // Using uint_least32_t in an audio interface expecting you to cast to short*? :( Weird stuff.
    assert(sizeof(gambatte::uint_least32_t) == sizeof(uint32_t));
    gb.setInputGetter(&gb_input);
@@ -2495,6 +2511,7 @@ bool retro_load_game(const struct retro_game_info *info)
          environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
    }
 
+#if !defined(SF2000)
 #if defined(VIDEO_RGB565) || defined(VIDEO_ABGR1555)
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
@@ -2509,6 +2526,7 @@ bool retro_load_game(const struct retro_game_info *info)
       gambatte_log(RETRO_LOG_ERROR, "XRGB8888 is not supported.\n");
       return false;
    }
+#endif
 #endif
    
    bool has_gbc_bootloader = file_present_in_system("gbc_bios.bin");
