@@ -18,7 +18,7 @@
 #endif
 
 #ifndef PATH_MAX_LENGTH
-#if defined(_XBOX1) || defined(_3DS) || defined(PSP) || defined(PS2) || defined(GEKKO)|| defined(WIIU) || defined(ORBIS) || defined(__PSL1GHT__) || defined(__PS3__)
+#if defined(_XBOX1) || defined(_3DS) || defined(PSP) || defined(PS2) || defined(GEKKO)|| defined(WIIU) || defined(ORBIS) || defined(__PSL1GHT__) || defined(__PS3__) || defined(SF2000)
 #define PATH_MAX_LENGTH 512
 #else
 #define PATH_MAX_LENGTH 4096
@@ -113,8 +113,13 @@ bool use_official_bootloader = false;
 /* Native GB/GBC hardware audio sample rate (~2 MHz) */
 #define SOUND_SAMPLE_RATE_NATIVE  (VIDEO_REFRESH_RATE * (double)SOUND_SAMPLES_PER_FRAME)
 
+#if !defined(SF2000)
 #define SOUND_SAMPLE_RATE_CC      (SOUND_SAMPLE_RATE_NATIVE / CC_DECIMATION_RATE) /* ~64k */
 #define SOUND_SAMPLE_RATE_BLIPPER (SOUND_SAMPLE_RATE_NATIVE / 64) /* ~32k */
+#else
+#define SOUND_SAMPLE_RATE_CC      (SOUND_SAMPLE_RATE_NATIVE / 65.536) /* 32000 */
+#define SOUND_SAMPLE_RATE_BLIPPER (SOUND_SAMPLE_RATE_NATIVE / 65.536) /* 32000 */
+#endif
 
 /* GB::runFor() nominally generates up to
  * (SOUND_SAMPLES_PER_RUN + 2064) samples, which
@@ -1554,8 +1559,12 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.aspect_ratio = (float)GB_SCREEN_WIDTH / (float)VIDEO_HEIGHT;
 
    info->timing.fps            = VIDEO_REFRESH_RATE;
+#if !defined(SF2000)
    info->timing.sample_rate    = use_cc_resampler ?
          SOUND_SAMPLE_RATE_CC : SOUND_SAMPLE_RATE_BLIPPER;
+#else
+   info->timing.sample_rate    = 32000;
+#endif
 }
 
 static void check_system_specs(void)
