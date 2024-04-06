@@ -2435,7 +2435,6 @@ static void check_variables(bool startup)
          break;
       default: // GB_COLORIZATION_DISABLED
          gbc_bios_palette = findGbcDirPal("GBC - Grayscale");
-         isGbcPalette = true;
          break;
    }
    
